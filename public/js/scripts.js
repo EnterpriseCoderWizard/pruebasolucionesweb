@@ -1,31 +1,37 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Seleccionamos los botones por su nombre y valor
-  const syncButton = document.querySelector(
-    'button[name="action"][value="sync"]'
-  );
-  const deleteButton = document.querySelector(
-    'button[name="action"][value="delete"]'
-  );
-
-  // Manejar el clic en el botón de sincronizar productos
-  if (syncButton) {
-    syncButton.addEventListener("click", function (event) {
-      // Confirmar antes de sincronizar productos
-      if (!confirm("¿Estás seguro de que deseas sincronizar los productos?")) {
-        event.preventDefault(); // Evita que el formulario se envíe si el usuario cancela
-      }
+  // Manejar el clic en el botón de sincronización
+  document
+    .querySelector('button[name="action"][value="sync"]')
+    .addEventListener("click", function (event) {
+      event.preventDefault();
+      performAction("sync");
     });
-  }
 
-  // Manejar el clic en el botón de eliminar productos
-  if (deleteButton) {
-    deleteButton.addEventListener("click", function (event) {
-      // Confirmar antes de eliminar productos
-      if (
-        !confirm("¿Estás seguro de que deseas eliminar todos los productos?")
-      ) {
-        event.preventDefault(); // Evita que el formulario se envíe si el usuario cancela
-      }
+  // Manejar el clic en el botón de eliminación
+  document
+    .querySelector('button[name="action"][value="delete"]')
+    .addEventListener("click", function (event) {
+      event.preventDefault();
+      performAction("delete");
     });
+
+  // Función para realizar una solicitud AJAX
+  function performAction(action) {
+    fetch("../public/index.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        action: action,
+      }),
+    })
+      .then((response) => response.text())
+      .then((html) => {
+        document.getElementById("table-container").innerHTML = html;
+      })
+      .catch((error) =>
+        console.error(`Error performing ${action} action:`, error)
+      );
   }
 });
