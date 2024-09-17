@@ -7,14 +7,13 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">    
     <link rel="stylesheet" href="./styles/styles.css">    
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
-
 </head>
 <body>
     <div class="container">
         <h1 class="centered">Product Management</h1>
         <form id="action-form" method="post" class="centered mb-3">
-            <button type="submit" name="action" value="sync" class="btn btn-primary mr-2">Sincronizar productos</button>
-            <button type="submit" name="action" value="delete" class="btn btn-danger">Eliminar productos</button>
+            <button type="submit" name="action" value="sync" id="sync-button" class="btn btn-primary mr-2">Sincronizar productos</button>
+            <button type="submit" name="action" value="delete" id="delete-button" class="btn btn-danger">Eliminar productos</button>
         </form>
 
         <!-- Aquí estará el contenido dinámico de la tabla -->
@@ -32,6 +31,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const loaderContainer = document.querySelector('.loader-container');
+            const syncButton = document.getElementById('sync-button');
+            const deleteButton = document.getElementById('delete-button');
 
             function showLoader() {
                 loaderContainer.style.display = 'block';
@@ -41,47 +42,45 @@
                 loaderContainer.style.display = 'none';
             }
 
-            document.querySelector('button[name="action"][value="sync"]').addEventListener("click", function (event) {
-                event.preventDefault();
-                showLoader();
-                fetch("../public/index.php", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams({ action: "sync" }),
-                })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById("table-container").innerHTML = html;
-                    hideLoader();
-                })
-                .catch(error => {
-                    console.error('Error syncing products:', error);
-                    hideLoader();
-                });
-            });
+            function disableButtons() {
+                syncButton.disabled = true;
+                deleteButton.disabled = true;
+            }
 
-            document.querySelector('button[name="action"][value="delete"]').addEventListener("click", function (event) {
-                event.preventDefault();
-                showLoader();
-                fetch("../public/index.php", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams({ action: "delete" }),
-                })
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById("table-container").innerHTML = html;
-                    hideLoader();
-                })
-                .catch(error => {
-                    console.error('Error deleting products:', error);
-                    hideLoader();
-                });
-            });
+            function enableButtons() {
+                syncButton.disabled = false;
+                deleteButton.disabled = false;
+            }
+
+            function handleButtonClick(action) {
+                return function (event) {
+                    event.preventDefault();
+                    disableButtons();
+                    showLoader();
+                    fetch("../public/index.php", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({ action: action }),
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById("table-container").innerHTML = html;
+                        hideLoader();
+                    })
+                    .catch(error => {
+                        console.error(`Error ${action} products:`, error);
+                        hideLoader();
+                    })
+                    .finally(() => {
+                        enableButtons();
+                    });
+                };
+            }
+
+            syncButton.addEventListener("click", handleButtonClick("sync"));
+            deleteButton.addEventListener("click", handleButtonClick("delete"));
         });
     </script>
 </body>
