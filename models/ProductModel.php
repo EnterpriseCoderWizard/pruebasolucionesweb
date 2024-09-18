@@ -5,7 +5,7 @@ class ProductModel {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = Database::getConnection(); // Asegúrate de que 'Database::getConnection()' devuelva la conexión PDO
+        $this->pdo = Database::getConnection(); 
     }
 
     public function syncProducts($products) {
@@ -165,5 +165,22 @@ class ProductModel {
     public function deleteAllProducts() {
         $this->pdo->exec("DELETE FROM producto");
     }
+
+    public function searchProducts($query) {      
+         try {
+            // $stmt = $this->pdo->prepare("SELECT * FROM producto WHERE id = :query");
+            $stmt = $this->pdo->prepare("SELECT * FROM producto WHERE sku LIKE :query");
+            $stmt->execute([':query' => $query]);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);                 
+            return $result;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return [];
+        }
+    }    
+    
+    
 }
 ?>
+
+

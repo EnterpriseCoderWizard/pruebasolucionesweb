@@ -1,14 +1,13 @@
 <?php
 require_once '../controllers/ProductController.php';
 
-
-
 // Controlador
 $controller = new ProductController();
 
-
 // Acción por defecto
-$action = $_POST['action'] ?? ''; 
+$action = $_GET['action'] ?? ''; 
+$query = $_GET['query'] ?? '';
+
 
 // Lógica del switch para manejar las acciones
 switch ($action) {
@@ -17,6 +16,9 @@ switch ($action) {
         break;
     case 'delete':
         $controller->delete();
+        break;
+    case 'search':        
+        $controller->searchProducts($query);
         break;
     default:
         $controller->index();

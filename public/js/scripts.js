@@ -1,37 +1,81 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Manejar el clic en el botón de sincronización
-  document
-    .querySelector('button[name="action"][value="sync"]')
-    .addEventListener("click", function (event) {
-      event.preventDefault();
-      performAction("sync");
-    });
+  const loaderContainer = document.querySelector(".loader-container");
+  const searchButton = document.getElementById("search-button");
+  const syncButton = document.getElementById("sync-button");
+  const deleteButton = document.getElementById("delete-button");
+  const actionForm = document.getElementById("action-form");
+  const searchInput = document.getElementById("search-query");
 
-  // Manejar el clic en el botón de eliminación
-  document
-    .querySelector('button[name="action"][value="delete"]')
-    .addEventListener("click", function (event) {
-      event.preventDefault();
-      performAction("delete");
-    });
+  function showLoader() {
+    loaderContainer.style.display = "block";
+  }
 
-  // Función para realizar una solicitud AJAX
-  function performAction(action) {
-    fetch("../public/index.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        action: action,
-      }),
+  function hideLoader() {
+    loaderContainer.style.display = "none";
+  }
+
+  function disableButtons() {
+    searchButton.disabled = true;
+    syncButton.disabled = true;
+    deleteButton.disabled = true;
+  }
+
+  function enableButtons() {
+    searchButton.disabled = false;
+    syncButton.disabled = false;
+    deleteButton.disabled = false;
+  }
+
+  function showError(message) {
+    const tableContainer = document.getElementById("table-container");
+    tableContainer.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+  }
+
+  function performAction(action, query = "") {
+    showLoader();
+    disableButtons();
+
+    const url = new URL("../public/index.php", window.location.href);
+    if (query) url.searchParams.append("query", query);
+    if (action) url.searchParams.append("action", action);
+
+    fetch(url, {
+      method: "GET",
     })
       .then((response) => response.text())
       .then((html) => {
-        document.getElementById("table-container").innerHTML = html;
+        const tableContainer = document.getElementById("table-container");
+        tableContainer.innerHTML = html;
+
+        searchInput.value = "";
       })
-      .catch((error) =>
-        console.error(`Error performing ${action} action:`, error)
-      );
+      .catch((error) => {
+        console.error(`Error performing ${action} action:`, error);
+      })
+      .finally(() => {
+        hideLoader();
+        enableButtons();
+      });
   }
+
+  searchButton.addEventListener("click", function () {
+    const query = searchInput.value.trim();
+    if (query === "") {
+      showError("El código SKU no puede estar vacío.");
+    } else {
+      performAction("search", query);
+    }
+  });
+
+  syncButton.addEventListener("click", function () {
+    performAction("sync");
+  });
+
+  deleteButton.addEventListener("click", function () {
+    performAction("delete");
+  });
+
+  actionForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+  });
 });
