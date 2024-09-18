@@ -41,7 +41,10 @@ class ProductController {
         if (empty($products)) {
             echo '<h3>No hay datos sincronizados</h3>';
         } else {
+<<<<<<< HEAD
             
+=======
+>>>>>>> ea4ccc19267c015b42f1f791a9760679a347990d
             echo '<table class="table">';
             echo '<thead class="thead-dark"><tr>';
             foreach (array_keys($products[0]) as $key) {

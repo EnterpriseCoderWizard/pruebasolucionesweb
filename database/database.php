@@ -14,7 +14,7 @@ class Database {
                 );
                 self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
-                die("Error de conexión: " . $e->getMessage()); // Usé die() para detener la ejecución si hay error
+                die("Error de conexión: " . $e->getMessage()); 
             }
         }
         return self::$connection;
