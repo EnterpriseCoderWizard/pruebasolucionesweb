@@ -1,7 +1,6 @@
 <?php
 require_once '../controllers/ProductController.php';
 
-<<<<<<< HEAD
 // Controlador
 $controller = new ProductController();
 
@@ -9,11 +8,6 @@ $controller = new ProductController();
 $action = $_GET['action'] ?? ''; 
 $query = $_GET['query'] ?? '';
 
-=======
-$controller = new ProductController();
-
-$action = $_POST['action'] ?? ''; 
->>>>>>> ea4ccc19267c015b42f1f791a9760679a347990d
 
 
 switch ($action) {
