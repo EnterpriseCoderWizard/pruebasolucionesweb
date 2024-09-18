@@ -5,7 +5,7 @@ class ProductModel {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = Database::getConnection(); // Asegúrate de que 'Database::getConnection()' devuelva la conexión PDO
+        $this->pdo = Database::getConnection(); 
     }
 
     public function syncProducts($products) {
